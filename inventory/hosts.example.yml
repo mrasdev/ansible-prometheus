@@ -1,0 +1,6 @@
+# Copy to inventory/hosts.yml (git-ignored) and adjust
+monitoring:
+  hosts:
+    prometheus01:
+      ansible_host: 192.0.2.10   # IP of your LXC
+      ansible_user: root

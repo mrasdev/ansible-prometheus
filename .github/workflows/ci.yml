@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pipx install ansible-core
+
+      - name: Run playbook (first run)
+        run: ansible-playbook -i inventory/local.yml site.yml
+
+      - name: Check idempotence (second run must report changed=0)
+        run: |
+          ansible-playbook -i inventory/local.yml site.yml | tee run2.log
+          grep -qE 'changed=0\s+unreachable=0\s+failed=0' run2.log
+
+      - name: Check services are reachable
+        run: |
+          curl -fsS --retry 10 --retry-delay 2 --retry-connrefused http://localhost:9090/-/ready
+          curl -fsS http://localhost:9100/metrics | head -n 5

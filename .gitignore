@@ -1,0 +1,10 @@
+# Local inventory with real hosts (use inventory/hosts.example.yml as template)
+inventory/hosts.yml
+
+# Logs
+*.log
+
+# Editor / OS
+.vscode/
+Thumbs.db
+.DS_Store

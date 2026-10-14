@@ -1,0 +1,6 @@
+# Target: the machine Ansible runs on (used in CI), no SSH
+monitoring:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3  # system Python (has python3-apt), not the pipx venv of Ansible

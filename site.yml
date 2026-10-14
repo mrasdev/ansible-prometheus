@@ -1,0 +1,23 @@
+---
+- name: Set up Prometheus server
+  hosts: monitoring          # group from the inventory
+  become: true               # run tasks as root (sudo)
+
+  tasks:
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - prometheus
+          - prometheus-node-exporter
+        state: present        # desired state: installed
+        update_cache: true
+        cache_valid_time: 3600  # refresh apt cache only if older than 1 h
+
+    - name: Start services and enable them at boot
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop:
+        - prometheus
+        - prometheus-node-exporter

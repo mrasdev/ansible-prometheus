@@ -1,0 +1,2 @@
+# Normalize line endings: always LF in repo and working copy
+* text=auto eol=lf
