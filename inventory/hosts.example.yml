@@ -1,6 +1,21 @@
 # Copy to inventory/hosts.yml (git-ignored) and adjust
+
+# Variables for all hosts
+all:
+  vars:
+    ansible_user: root
+
+# Host that runs the Prometheus server
 monitoring:
   hosts:
     prometheus01:
-      ansible_host: 192.0.2.10   # IP of your LXC
-      ansible_user: root
+      ansible_host: 192.0.2.10   # IP of your Prometheus LXC
+
+# Hosts that get node_exporter and are scraped by Prometheus
+nodes:
+  hosts:
+    prometheus01:                # monitors itself, too
+    pve01:
+      ansible_host: 192.0.2.20   # Proxmox host
+    docker01:
+      ansible_host: 192.0.2.21   # example LXC

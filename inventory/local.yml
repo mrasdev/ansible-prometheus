@@ -1,6 +1,11 @@
 # Target: the machine Ansible runs on (used in CI), no SSH
+# localhost is in both groups: it runs Prometheus AND is monitored itself
 monitoring:
   hosts:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: /usr/bin/python3  # system Python (has python3-apt), not the pipx venv of Ansible
+
+nodes:
+  hosts:
+    localhost:  # same host as above, variables are merged

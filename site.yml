@@ -1,23 +1,38 @@
 ---
-- name: Set up Prometheus server
-  hosts: monitoring          # group from the inventory
-  become: true               # run tasks as root (sudo)
+# Play 1: every monitored host gets node_exporter
+- name: Install node_exporter on all monitored hosts
+  hosts: nodes
+  become: true
 
   tasks:
-    - name: Install packages
+    - name: Install node_exporter
       ansible.builtin.apt:
-        name:
-          - prometheus
-          - prometheus-node-exporter
-        state: present        # desired state: installed
+        name: prometheus-node-exporter
+        state: present
         update_cache: true
         cache_valid_time: 3600  # refresh apt cache only if older than 1 h
 
-    - name: Start services and enable them at boot
+    - name: Start node_exporter and enable it at boot
       ansible.builtin.systemd_service:
-        name: "{{ item }}"
+        name: prometheus-node-exporter
         state: started
         enabled: true
-      loop:
-        - prometheus
-        - prometheus-node-exporter
+
+# Play 2: the monitoring host gets the Prometheus server
+- name: Set up Prometheus server
+  hosts: monitoring
+  become: true
+
+  tasks:
+    - name: Install Prometheus
+      ansible.builtin.apt:
+        name: prometheus
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Start Prometheus and enable it at boot
+      ansible.builtin.systemd_service:
+        name: prometheus
+        state: started
+        enabled: true
