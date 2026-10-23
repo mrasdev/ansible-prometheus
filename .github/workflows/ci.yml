@@ -32,3 +32,14 @@ jobs:
         run: |
           curl -fsS --retry 10 --retry-delay 2 --retry-connrefused http://localhost:9090/-/ready
           curl -fsS http://localhost:9100/metrics | head -n 5
+
+      - name: Check node_exporter target is scraped (health=up)
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:9090/api/v1/targets \
+              | jq -e '.data.activeTargets[] | select(.labels.job == "node" and .health == "up")' > /dev/null; then
+              echo "node target is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "node target not up after 60 s"; exit 1

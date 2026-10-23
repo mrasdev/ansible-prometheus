@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+# Generated from the inventory: every host in group "nodes" is scraped.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus monitors itself
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # node_exporter on all hosts of group "nodes"
+  - job_name: node
+    static_configs:
+{% for host in groups['nodes'] %}
+      - targets: ['{{ hostvars[host].ansible_host | default(host) }}:9100']
+        labels:
+          host: '{{ host }}'
+{% endfor %}
