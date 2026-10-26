@@ -1,0 +1,13 @@
+---
+# Backs up every LXC (except the control node) on the Proxmox host before updates.
+# Per guest: new protected backup in stop mode, then older "ansible" backups are removed.
+- name: Back up LXCs before updates
+  hosts: proxmox
+  become: true
+
+  tasks:
+    - name: Back up each guest
+      ansible.builtin.include_tasks: tasks/backup_guest.yml
+      loop: "{{ backup_only | default(query('inventory_hostnames', 'apt:docker:!ansible')) }}"  # test: -e '{"backup_only": ["homepage"]}'
+      loop_control:
+        loop_var: guest
