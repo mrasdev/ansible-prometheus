@@ -17,6 +17,7 @@
         name: prometheus-node-exporter
         state: started
         enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"  # in --check the package is not really installed
 
 # Play 2: the monitoring host gets the Prometheus server
 - name: Set up Prometheus server
@@ -31,8 +32,25 @@
         update_cache: true
         cache_valid_time: 3600
 
+    - name: Deploy prometheus.yml with scrape targets from the inventory
+      ansible.builtin.template:
+        src: prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+        owner: root
+        group: root
+        mode: "0644"
+        validate: promtool check config %s  # old config stays if the check fails
+      notify: Restart Prometheus
+
     - name: Start Prometheus and enable it at boot
       ansible.builtin.systemd_service:
         name: prometheus
         state: started
         enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"
+
+  handlers:
+    - name: Restart Prometheus
+      ansible.builtin.systemd_service:
+        name: prometheus
+        state: restarted
