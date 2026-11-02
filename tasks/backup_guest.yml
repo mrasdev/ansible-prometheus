@@ -1,5 +1,5 @@
 ---
-- name: "Back up {{ guest }} in stop mode"
+- name: "Stop-mode backup of {{ guest }}"
   ansible.builtin.command:
     argv:
       - vzdump
@@ -15,7 +15,7 @@
       - --prune-backups
       - keep-all=1
       - --notes-template
-      - !unsafe "{{guestname}} ansible"
+      - !unsafe "{{ guestname }} ansible"
   async: 3600
   poll: 15
   changed_when: true

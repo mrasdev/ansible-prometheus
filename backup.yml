@@ -7,7 +7,8 @@
 
   tasks:
     - name: Back up each guest
+      # Test with a single guest: -e '{"backup_only": ["homepage"]}'
       ansible.builtin.include_tasks: tasks/backup_guest.yml
-      loop: "{{ backup_only | default(query('inventory_hostnames', 'apt:docker:!ansible')) }}"  # test: -e '{"backup_only": ["homepage"]}'
+      loop: "{{ backup_only | default(query('inventory_hostnames', 'apt:docker:!ansible')) }}"
       loop_control:
         loop_var: guest
