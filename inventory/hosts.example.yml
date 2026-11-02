@@ -5,17 +5,30 @@ all:
   vars:
     ansible_user: root
 
-# Host that runs the Prometheus server
+# Host that runs the Prometheus server (address is set in group "apt")
 monitoring:
   hosts:
     prometheus01:
-      ansible_host: 192.0.2.10   # IP of your Prometheus LXC
 
 # Hosts that get node_exporter and are scraped by Prometheus
 nodes:
   hosts:
-    prometheus01:                # monitors itself, too
     pve01:
       ansible_host: 192.0.2.20   # Proxmox host
-    docker01:
-      ansible_host: 192.0.2.21   # example LXC
+  children:
+    apt:                         # every container in "apt" is scraped, too
+
+# Debian containers upgraded by update.yml
+apt:
+  hosts:
+    prometheus01:
+      ansible_host: 192.0.2.10   # Prometheus LXC, monitors itself, too
+    app01:
+      ansible_host: 192.0.2.30   # example LXC
+
+# Containers with a Docker Compose stack (must also be in "apt")
+docker:
+  hosts:
+    app01:
+      compose_file: /root/docker-compose.yml
+      compose_auto_update: true  # false: update.yml only prints a reminder
