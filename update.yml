@@ -4,6 +4,10 @@
   hosts: apt
   become: true
 
+  environment:
+    APT_LISTCHANGES_FRONTEND: none
+    DEBIAN_FRONTEND: noninteractive
+
   tasks:
     - name: Upgrade all packages
       ansible.builtin.apt:
