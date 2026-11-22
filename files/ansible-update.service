@@ -1,0 +1,14 @@
+# Managed by Ansible (controller.yml)
+[Unit]
+Description=Weekly Ansible update run
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/ansible-update.env
+# ~/.ansible.cfg is ignored when the repo has its own ansible.cfg, so set the log here
+Environment=ANSIBLE_LOG_PATH=/root/ansible.log
+# flock -n: skip the run if the previous one is still active
+ExecStart=/usr/bin/flock -n /run/ansible-update.lock /usr/local/bin/ansible-update.sh
+TimeoutStartSec=2h

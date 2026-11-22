@@ -31,7 +31,7 @@ jobs:
 
       - name: Syntax check all playbooks
         run: |
-          for pb in site.yml backup.yml update.yml; do
+          for pb in site.yml update.yml controller.yml; do
             ansible-playbook -i inventory/local.yml --syntax-check "$pb"
           done
 
