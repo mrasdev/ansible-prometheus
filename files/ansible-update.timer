@@ -1,11 +1,8 @@
-# Managed by Ansible (controller.yml)
 [Unit]
-Description=Weekly Ansible update run, Sunday 03:00
+Description=Weekly Ansible update run
 
 [Timer]
 OnCalendar=Sun *-*-* 03:00:00
-# No Persistent=true: a missed run is not made up during the day
-Unit=ansible-update.service
 
 [Install]
 WantedBy=timers.target
