@@ -13,9 +13,9 @@
           ha_webhook_url is missing. Create it with
           'ansible-vault encrypt_string --name ha_webhook_url' in group_vars/controller.yml
 
-    - name: Install tools used by the wrapper script
+    - name: Install git for the wrapper script
       ansible.builtin.apt:
-        name: [curl, git, jq]
+        name: git
         state: present
         update_cache: true
         cache_valid_time: 3600
