@@ -1,0 +1,11 @@
+[Unit]
+Description=Ansible update run
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/ansible-update.env
+Environment=ANSIBLE_LOG_PATH=/root/ansible.log
+ExecStart=/usr/bin/flock -n /run/ansible-update.lock /usr/local/bin/ansible-update.sh
+TimeoutStartSec=4h

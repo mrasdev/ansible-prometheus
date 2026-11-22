@@ -1,0 +1,5 @@
+# Variables for the control node (controller.yml)
+#
+# ha_webhook_url is a secret and stored encrypted. Create it on the control node:
+#   ansible-vault encrypt_string --vault-password-file ~/.ansible-vault-pass --name ha_webhook_url
+# and paste the output below. Only this value is encrypted, so update.yml runs without the vault password.

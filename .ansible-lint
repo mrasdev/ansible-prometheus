@@ -1,3 +1,3 @@
 profile: production
 exclude_paths:
-  - inventory/hosts.yml
+  - inventory/hosts.yml*

@@ -1,5 +1,5 @@
 # Local inventory with real hosts (use inventory/hosts.example.yml as template)
-inventory/hosts.yml
+inventory/hosts.yml*
 
 # Logs
 *.log

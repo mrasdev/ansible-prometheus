@@ -15,8 +15,6 @@
         upgrade: dist
         autoremove: true
         autoclean: true
-      environment:
-        DEBIAN_FRONTEND: noninteractive
 
     - name: Check whether a reboot is required
       ansible.builtin.stat:

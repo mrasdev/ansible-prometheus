@@ -1,0 +1,65 @@
+---
+# Sets up the weekly unattended update run on the Ansible control node:
+# wrapper script, systemd service and timer, webhook URL from Ansible Vault.
+- name: Set up the weekly update run on the control node
+  hosts: controller
+  become: true
+
+  tasks:
+    - name: Check that the webhook URL is configured
+      ansible.builtin.assert:
+        that: ha_webhook_url is defined
+        fail_msg: >-
+          ha_webhook_url is missing. Create it with
+          'ansible-vault encrypt_string --name ha_webhook_url' in group_vars/controller.yml
+
+    - name: Install git for the wrapper script
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Deploy wrapper script
+      ansible.builtin.copy:
+        src: ansible-update.sh
+        dest: /usr/local/bin/ansible-update.sh
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Deploy webhook URL for the service (secret, not shown in --diff)
+      ansible.builtin.template:
+        src: ansible-update.env.j2
+        dest: /etc/ansible-update.env
+        owner: root
+        group: root
+        mode: "0600"
+      diff: false
+
+    - name: Deploy systemd service and timer
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - ansible-update.service
+        - ansible-update.timer
+      notify: Reload systemd
+
+    - name: Reload systemd before enabling new units
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable and start the timer
+      ansible.builtin.systemd_service:
+        name: ansible-update.timer
+        state: started
+        enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"  # in --check the unit file is not really there
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true
