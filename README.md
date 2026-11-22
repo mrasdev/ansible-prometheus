@@ -157,6 +157,11 @@ all:
   vars:
     ansible_user: root
 
+controller:
+  hosts:
+    ansible01:
+      ansible_connection: local
+
 monitoring:
   hosts:
     prometheus01:
@@ -192,10 +197,12 @@ ansible-playbook site.yml
 ```
 
 To set up the weekly run on the control node, encrypt the webhook URL
-and run `controller.yml`:
+and run `controller.yml`. `read -rs` keeps the URL out of the shell history;
+`encrypt_string` writes no final newline, so the `echo` adds one for yamllint.
 
 ```
-ansible-vault encrypt_string --vault-password-file ~/.ansible-vault-pass --name ha_webhook_url >> group_vars/controller.yml
+read -rs URL && printf '%s' "$URL" | ansible-vault encrypt_string --vault-password-file ~/.ansible-vault-pass --stdin-name ha_webhook_url >> group_vars/controller.yml; unset URL
+echo >> group_vars/controller.yml
 ansible-playbook controller.yml --vault-password-file ~/.ansible-vault-pass --check --diff
 ansible-playbook controller.yml --vault-password-file ~/.ansible-vault-pass
 systemctl list-timers ansible-update.timer
